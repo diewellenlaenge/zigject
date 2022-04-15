@@ -1,6 +1,5 @@
 const std = @import("std");
 const L = std.unicode.utf8ToUtf16LeStringLiteral;
-const heap = std.heap;
 
 const win = std.os.windows;
 const win32 = @import("lib/zigwin32/win32.zig");
@@ -17,24 +16,17 @@ pub const InjectError = error {
     GetModuleHandleW,
     GetProcAddress,
     CreateRemoteThread,
-    utf8ToUtf16LeWithNull,
 };
 
-pub fn RemoteThread(pid: win.DWORD, path: []const u8) InjectError!bool {
+pub fn RemoteThread(pid: win.DWORD, path: []const u16) InjectError!bool {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return InjectError.OpenProcess;
     defer _ = win32.foundation.CloseHandle(process);
 
-    var gpa = heap.GeneralPurposeAllocator(.{}){};
-    var galloc = gpa.allocator();
-
-    const pathW = std.unicode.utf8ToUtf16LeWithNull(galloc, path) catch return InjectError.utf8ToUtf16LeWithNull;
-    defer galloc.free(pathW);
-    const pathSize: usize = (pathW.len + 1) * @sizeOf(std.meta.Child(@TypeOf(pathW)));
-
+    const pathSize: usize = (path.len + 1) * @sizeOf(std.meta.Child(@TypeOf(path)));
     const buffer = memory.VirtualAllocEx(process, null, pathSize, memory.MEM_COMMIT, memory.PAGE_READWRITE) orelse return InjectError.VirtualAllocEx;
     defer _ = memory.VirtualFreeEx(process, buffer, 0, memory.MEM_RELEASE);
 
-    if (debug.WriteProcessMemory(process, buffer, @ptrCast(*const anyopaque, pathW), pathSize, null) == win.FALSE) {
+    if (debug.WriteProcessMemory(process, buffer, @ptrCast(*const anyopaque, path), pathSize, null) == win.FALSE) {
         return InjectError.WriteProcessMemory;
     }
 
