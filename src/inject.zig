@@ -18,7 +18,7 @@ pub const InjectError = error {
     CreateRemoteThread,
 };
 
-pub fn RemoteThread(pid: win.DWORD, path: []const u16) InjectError!bool {
+pub fn RemoteThread(pid: win.DWORD, path: []const u16, wait: bool) InjectError!bool {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return InjectError.OpenProcess;
     defer _ = win32.foundation.CloseHandle(process);
 
@@ -34,7 +34,9 @@ pub fn RemoteThread(pid: win.DWORD, path: []const u16) InjectError!bool {
     const loadLibrary = loader.GetProcAddress(kernel32, "LoadLibraryW") orelse return InjectError.GetProcAddress;
     const thread = threading.CreateRemoteThread(process, null, 0, @ptrCast(threading.LPTHREAD_START_ROUTINE, loadLibrary), buffer, 0, null) orelse return InjectError.CreateRemoteThread;
 
-    _ = threading.WaitForSingleObject(thread, win.INFINITE);
+    if (wait) {
+        _ = threading.WaitForSingleObject(thread, win.INFINITE);
+    }
 
     return true;
 }
