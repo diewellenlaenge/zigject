@@ -22,7 +22,7 @@ pub const RemoteThreadError = error {
 
 pub fn RemoteThread(pid: win.DWORD, path: []const u8) RemoteThreadError!bool {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return RemoteThreadError.OpenProcess;
-    defer _= win32.foundation.CloseHandle(process);
+    defer _ = win32.foundation.CloseHandle(process);
 
     var gpa = heap.GeneralPurposeAllocator(.{}){};
     var galloc = gpa.allocator();
