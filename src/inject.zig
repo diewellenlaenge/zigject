@@ -22,7 +22,7 @@ pub const InjectError = error {
 // return value is only valid wait is true
 pub fn RemoteThread(pid: win.DWORD, path: []const u16, wait: bool) InjectError!u32 {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return InjectError.OpenProcess;
-    defer _ = win32.foundation.CloseHandle(process);
+    defer _ = foundation.CloseHandle(process);
 
     const path_size: usize = (path.len + 1) * @sizeOf(std.meta.Child(@TypeOf(path)));
     const buffer = memory.VirtualAllocEx(process, null, path_size, memory.MEM_COMMIT, memory.PAGE_READWRITE) orelse return InjectError.VirtualAllocEx;
