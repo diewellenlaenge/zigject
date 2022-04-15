@@ -20,8 +20,8 @@ pub const InjectError = error {
 };
 
 // return value is only valid wait is true
-pub fn RemoteThread(pid: win.DWORD, path: []const u16, wait: bool) InjectError!u32 {
-    const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return InjectError.OpenProcess;
+pub fn RemoteThread(process_id: win.DWORD, path: []const u16, wait: bool) InjectError!u32 {
+    const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, process_id) orelse return InjectError.OpenProcess;
     defer _ = foundation.CloseHandle(process);
 
     const path_size: usize = (path.len + 1) * @sizeOf(std.meta.Child(@TypeOf(path)));
