@@ -16,9 +16,11 @@ pub const InjectError = error {
     GetModuleHandleW,
     GetProcAddress,
     CreateRemoteThread,
+    GetExitCodeThread,
 };
 
-pub fn RemoteThread(pid: win.DWORD, path: []const u16, wait: bool) InjectError!bool {
+// return value is only valid wait is true
+pub fn RemoteThread(pid: win.DWORD, path: []const u16, wait: bool) InjectError!u32 {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return InjectError.OpenProcess;
     defer _ = win32.foundation.CloseHandle(process);
 
@@ -38,5 +40,10 @@ pub fn RemoteThread(pid: win.DWORD, path: []const u16, wait: bool) InjectError!b
         _ = threading.WaitForSingleObject(thread, win.INFINITE);
     }
 
-    return true;
+    var result: u32 = 0;
+    if (threading.GetExitCodeThread(thread, &result) == win.FALSE) {
+        return InjectError.GetExitCodeThread;
+    }
+
+    return result;
 }
