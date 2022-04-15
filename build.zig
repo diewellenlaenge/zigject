@@ -12,7 +12,7 @@ pub fn build(b: *std.build.Builder) void {
     const mode = b.standardReleaseOptions();
 
     {
-        const exe = b.addExecutable("zigject-injecter", "test/injecter.zig");
+        const exe = b.addExecutable("zigject-injecter", "injecter/injecter.zig");
         exe.addPackagePath("zigject", "src/zigject.zig");
         exe.addPackagePath("win32", "src/lib/zigwin32/win32.zig");
         exe.setTarget(target);
@@ -30,7 +30,7 @@ pub fn build(b: *std.build.Builder) void {
     }
 
     {
-        const lib = b.addSharedLibrary("zigject-injectee", "test/injectee.zig", std.build.LibExeObjStep.SharedLibKind.unversioned);
+        const lib = b.addSharedLibrary("zigject-injectee", "injecter/injectee.zig", std.build.LibExeObjStep.SharedLibKind.unversioned);
         lib.addPackagePath("win32", "src/lib/zigwin32/win32.zig");
         lib.setBuildMode(mode);
         lib.install();
