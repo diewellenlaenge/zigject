@@ -10,7 +10,7 @@ pub const ProcessError = error {
     ProcessNotFound
 };
 
-// process_name is case sensitive (for now)
+/// process_name is case sensitive (for now)
 pub fn FindFirstProcessIdByName(process_name: []const u16) ProcessError!win.DWORD {
     const snapshot = tool_help.CreateToolhelp32Snapshot(tool_help.TH32CS_SNAPPROCESS, 0) orelse return ProcessError.CreateToolhelp32Snapshot;
     if (snapshot == win.INVALID_HANDLE_VALUE) {
