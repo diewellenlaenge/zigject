@@ -15,11 +15,10 @@ pub const InjectError = error {
     WriteProcessMemory,
     GetModuleHandleW,
     GetProcAddress,
-    GetExitCodeThread,
     CreateRemoteThread,
 };
 
-pub fn RemoteThread(pid: win.DWORD, path: []const u16) InjectError!?win.HMODULE {
+pub fn RemoteThread(pid: win.DWORD, path: []const u16) InjectError!bool {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, pid) orelse return InjectError.OpenProcess;
     defer _ = win32.foundation.CloseHandle(process);
 
@@ -36,11 +35,6 @@ pub fn RemoteThread(pid: win.DWORD, path: []const u16) InjectError!?win.HMODULE 
     const thread = threading.CreateRemoteThread(process, null, 0, @ptrCast(threading.LPTHREAD_START_ROUTINE, loadLibrary), buffer, 0, null) orelse return InjectError.CreateRemoteThread;
 
     _ = threading.WaitForSingleObject(thread, win.INFINITE);
-    var module: ?win.HMODULE = null;
 
-    if (threading.GetExitCodeThread(thread, @ptrCast(*u32, &module)) == win.FALSE) {
-        return InjectError.GetExitCodeThread;
-    }
-
-    return module;
+    return true;
 }
