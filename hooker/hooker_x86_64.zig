@@ -20,13 +20,14 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
+    //zigject.hook.hook_pre(@TypeOf(comptime x64call), @TypeOf(comptime hook_pre_x64call));
     std.log.info("calling   x64call({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = x64call(a1, a2, a3, a4, a5);
     std.log.info("result    x64call(): {d}", .{res});
 
     std.log.info("", .{});
     std.log.info("calling   sysv({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
-    res = sysv(a1, a2, a3, a4, a5);
+    res = sysvcall(a1, a2, a3, a4, a5);
     std.log.info("result    sysv(): {d}", .{res});
 
     std.log.info("", .{});
@@ -59,8 +60,8 @@ fn hook_pre_x64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u3
 //
 //
 //
-fn sysv(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
-    std.log.info("orig      sysv({d}, {d}, {d}, {d}, {d}) -> {d}", .{ p1, p2, p3, p4, p5, random_global });
+fn sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
+    std.log.info("orig      sysvcall({d}, {d}, {d}, {d}, {d}) -> {d}", .{ p1, p2, p3, p4, p5, random_global });
     return random_global;
 }
 
