@@ -9,11 +9,11 @@ var a3: u32 = 30;
 var a4: u32 = 40;
 var a5: u32 = 50;
 
-var orig_stdcall: ?utils.generate_fn_type(.Stdcall) = null;
-var orig_thiscall: ?utils.generate_fn_type(.Thiscall) = null;
-var orig_fastcall: ?utils.generate_fn_type(.Fastcall) = null;
-var orig_vectorcall: ?utils.generate_fn_type(.Vectorcall) = null;
-var orig_zigcall: ?utils.generate_fn_type(.Unspecified) = null;
+var orig_stdcall: ?utils.generate_fn_type(stdcall, .Stdcall) = null;
+var orig_thiscall: ?utils.generate_fn_type(thiscall, .Thiscall) = null;
+var orig_fastcall: ?utils.generate_fn_type(fastcall, .Fastcall) = null;
+var orig_vectorcall: ?utils.generate_fn_type(vectorcall, .Vectorcall) = null;
+var orig_zigcall: ?utils.generate_fn_type(zigcall, .Unspecified) = null;
 // TODO: orig_naked
 
 pub fn call() anyerror!void {
