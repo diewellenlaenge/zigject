@@ -9,10 +9,10 @@ var a3: u32 = 30;
 var a4: u32 = 40;
 var a5: u32 = 50;
 
-var orig_x64call: ?@TypeOf(x64call) = null;
-var orig_sysvcall: ?@TypeOf(sysvcall) = null;
-var orig_zigcall: ?@TypeOf(zigcall) = null;
-var orig_x64naked: ?@TypeOf(x64naked) = null;
+var orig_x64call: ?utils.generate_fn_type(x64call, .C) = null;
+var orig_sysvcall: ?utils.generate_fn_type(sysvcall, .SysV) = null;
+var orig_zigcall: ?utils.generate_fn_type(zigcall, .Unspecified) = null;
+// TODO: orig_naked
 
 pub fn call() anyerror!void {
     std.log.info("x86_64 call()", .{});
@@ -20,25 +20,22 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(x64call, hook_pre_x64call);
+    //zigject.hook.hook_pre(@TypeOf(comptime x64call), @TypeOf(comptime hook_pre_x64call));
     std.log.info("calling   x64call({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = x64call(a1, a2, a3, a4, a5);
     std.log.info("result    x64call(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(sysvcall, hook_pre_sysvcall);
     std.log.info("calling   sysv({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = sysvcall(a1, a2, a3, a4, a5);
     std.log.info("result    sysv(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(zigcall, hook_pre_zigcall);
     std.log.info("calling   zigcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = zigcall(a1, a2, a3, a4, a5);
     std.log.info("result    zigcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(x64naked, hook_pre_x64naked);
     std.log.info("calling   x64naked()", .{});
     asm volatile (
         \\jmp x64naked

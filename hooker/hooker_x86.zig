@@ -9,12 +9,12 @@ var a3: u32 = 30;
 var a4: u32 = 40;
 var a5: u32 = 50;
 
-var orig_stdcall: ?@TypeOf(stdcall) = null;
-var orig_thiscall: ?@TypeOf(thiscall) = null;
-var orig_fastcall: ?@TypeOf(fastcall) = null;
-var orig_vectorcall: ?@TypeOf(vectorcall) = null;
-var orig_zigcall: ?@TypeOf(zigcall) = null;
-//var orig_x86naked: ?@TypeOf(x86naked) = null;
+var orig_stdcall: ?utils.generate_fn_type(stdcall, .Stdcall) = null;
+var orig_thiscall: ?utils.generate_fn_type(thiscall, .Thiscall) = null;
+var orig_fastcall: ?utils.generate_fn_type(fastcall, .Fastcall) = null;
+var orig_vectorcall: ?utils.generate_fn_type(vectorcall, .Vectorcall) = null;
+var orig_zigcall: ?utils.generate_fn_type(zigcall, .Unspecified) = null;
+// TODO: orig_naked
 
 pub fn call() anyerror!void {
     std.log.info("x86 call()", .{});
@@ -22,31 +22,26 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(stdcall, hook_pre_stdcall);
     std.log.info("calling   stdcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = stdcall(a1, a2, a3, a4, a5);
     std.log.info("result    stdcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(thiscall, hook_pre_thiscall);
     std.log.info("calling   thiscall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = thiscall(a1, a2, a3, a4, a5);
     std.log.info("result    thiscall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(fastcall, hook_pre_fastcall);
     std.log.info("calling   fastcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = fastcall(a1, a2, a3, a4, a5);
     std.log.info("result    fastcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(vectorcall, hook_pre_vectorcall);
     std.log.info("calling   vectorcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = vectorcall(a1, a2, a3, a4, a5);
     std.log.info("result    vectorcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(zigcall, hook_pre_zigcall);
     std.log.info("calling   zigcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = zigcall(a1, a2, a3, a4, a5);
     std.log.info("result    zigcall(): {d}", .{res});
