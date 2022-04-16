@@ -53,7 +53,7 @@ fn x64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
 
 fn hook_pre_x64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("hook_pre  x64call({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_x64call(p1, p2, p3, p4, p5);
+    return orig_x64call.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -66,7 +66,7 @@ fn sysv(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
 
 fn hook_pre_sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("hook_pre  sysvcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_sysvcall(p1, p2, p3, p4, p5);
+    return orig_sysvcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -79,7 +79,7 @@ fn zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u
 
 fn hook_pre_zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u32 {
     std.log.info("hook_pre  zigcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_zigcall(p1, p2, p3, p4, p5);
+    return orig_zigcall.?(p1, p2, p3, p4, p5);
 }
 
 //

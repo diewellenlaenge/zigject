@@ -65,7 +65,7 @@ fn stdcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Stdcall) u32 {
 
 fn hook_pre_stdcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("hook_pre  stdcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_stdcall(p1, p2, p3, p4, p5);
+    return orig_stdcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -78,7 +78,7 @@ fn thiscall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Thiscall) u32
 
 fn hook_pre_thiscall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("hook_pre  thiscall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_thiscall(p1, p2, p3, p4, p5);
+    return orig_thiscall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -91,7 +91,7 @@ fn fastcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Fastcall) u32
 
 fn hook_pre_fastcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("hook_pre  fastcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_fastcall(p1, p2, p3, p4, p5);
+    return orig_fastcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -104,7 +104,7 @@ fn vectorcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Vectorcall)
 
 fn hook_pre_vectorcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("hook_pre  vectorcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_vectorcall(p1, p2, p3, p4, p5);
+    return orig_vectorcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -117,7 +117,7 @@ fn zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u
 
 fn hook_pre_zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u32 {
     std.log.info("hook_pre  zigcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_zigcall(p1, p2, p3, p4, p5);
+    return orig_zigcall.?(p1, p2, p3, p4, p5);
 }
 
 //
