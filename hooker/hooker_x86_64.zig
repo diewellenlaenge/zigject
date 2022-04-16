@@ -68,7 +68,7 @@ fn sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
     return random_global;
 }
 
-fn hook_pre_sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
+fn hook_pre_sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
     std.log.info("hook_pre  sysvcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
     return orig_sysvcall.?(p1, p2, p3, p4, p5);
 }
