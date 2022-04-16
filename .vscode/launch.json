@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/zig-out/bin/zigject-injecter.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "pwd": "${workspaceFolder}",
             "environment": [],
             "preLaunchTask": "build-x86_64"
         },
@@ -19,7 +19,7 @@
             "program": "${workspaceFolder}/zig-out/bin/zigject-hooker.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "pwd": "${workspaceFolder}",
             "environment": [],
             "preLaunchTask": "build-x86"
         }
