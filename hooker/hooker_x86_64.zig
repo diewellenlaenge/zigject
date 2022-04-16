@@ -9,10 +9,10 @@ var a3: u32 = 30;
 var a4: u32 = 40;
 var a5: u32 = 50;
 
-var orig_x64call: ?utils.generate_fn_type(x64call, .C) = null;
-var orig_sysvcall: ?utils.generate_fn_type(sysvcall, .SysV) = null;
-var orig_zigcall: ?utils.generate_fn_type(zigcall, .Unspecified) = null;
-var orig_x64naked: ?utils.generate_fn_type(x64naked, .Naked) = null;
+var orig_x64call: ?@TypeOf(x64call) = null;
+var orig_sysvcall: ?@TypeOf(sysvcall) = null;
+var orig_zigcall: ?@TypeOf(zigcall) = null;
+var orig_x64naked: ?@TypeOf(x64naked) = null;
 
 pub fn call() anyerror!void {
     std.log.info("x86_64 call()", .{});
