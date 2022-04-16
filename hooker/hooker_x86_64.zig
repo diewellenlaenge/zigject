@@ -49,7 +49,7 @@ pub fn call() anyerror!void {
 
 //
 //
-// .C propagates to Microsoft x64 calling convention: https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention
+// .C propagates to Microsoft x64 calling convention on 64bit target
 fn x64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     std.log.info("orig      x64call({d}, {d}, {d}, {d}, {d}) -> {d}", .{ p1, p2, p3, p4, p5, random_global });
     return random_global;
