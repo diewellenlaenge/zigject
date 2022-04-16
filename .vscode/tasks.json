@@ -2,10 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build-x86",
             "type": "shell",
-            "command": "zig build",
+            "command": "zig build -Dtarget=i386-windows-gnu",
             "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build-x86_64",
+            "type": "shell",
+            "command": "zig build -Dtarget=x86_64-windows-gnu",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$gcc"
             ]

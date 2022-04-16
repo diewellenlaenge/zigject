@@ -2,15 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "Launch x86_64",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/zig-out/bin/zigject-injecter.exe",
+            "program": "${workspaceFolder}/zig-out/bin/zigject-hooker.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "preLaunchTask": "build"
+            "preLaunchTask": "build-x86_64"
+        },
+        {
+            "name": "Launch x86",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/zig-out/bin/zigject-hooker.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "preLaunchTask": "build-x86"
         }
     ]
 }
