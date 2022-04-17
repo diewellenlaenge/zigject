@@ -5,7 +5,7 @@
             "name": "Launch x86_64",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/zig-out/bin/zigject-injecter.exe",
+            "program": "${workspaceFolder}/zig-out/bin/zigject-hooker.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
