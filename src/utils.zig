@@ -1,13 +1,11 @@
 const std = @import("std");
 const heap = std.heap;
 
-pub fn logUtf16String(utf16string: []const u16) !void {
-    var gpallocator = heap.GeneralPurposeAllocator(.{}){};
-    var alloc = gpallocator.allocator();
+pub fn toWide(alloc: std.mem.Allocator, from: []const u8) ![]const u16 {
+    return std.unicode.utf8ToUtf16LeWithNull(alloc, from);
+}
 
-    const utf8string = try std.unicode.utf16leToUtf8Alloc(alloc, utf16string);
-    defer alloc.free(utf8string);
-
-    std.log.info("{s}\n", .{utf8string});
+pub fn toNarrow(alloc: std.mem.Allocator, from: []const u16) ![]const u8 {
+    return std.unicode.utf16leToUtf8Alloc(alloc, from);
 }
 
