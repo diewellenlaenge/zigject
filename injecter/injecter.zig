@@ -29,19 +29,19 @@ pub fn main() anyerror!void {
     defer _ = gpa.deinit();
     const alloc = gpa.allocator();
 
-    const paths = [_][]const u8{current_exe_dir, "../lib/some_dll.dll"};
-    var joined_paths = try std.fs.path.join(alloc, &paths);
+    var joined_paths = try std.fs.path.join(alloc, &.{current_exe_dir, "../lib/zigject-injectee.dll"});
+    defer alloc.free(joined_paths);
 
     var buf = [_]u8{0} ** win.MAX_PATH;
     std.mem.copy(u8, &buf, joined_paths);
-    const path_len = try win.normalizePath(u8, &buf);
 
+    const path_len = try win.normalizePath(u8, &buf);
     const normalized = buf[0..path_len];
     std.log.info("normalized {s} with len {d}", .{normalized, normalized.len});
+
     const proc = try toWide("Notepad.exe");
     const dll = try toWide(normalized);
 
-//"../lib/zigject-injectee.dll"
     const pid = zigject.process.FindFirstProcessIdByName(proc) catch {
         std.log.err("Could not find process {s}", .{try toNarrow(proc)});
         return;
