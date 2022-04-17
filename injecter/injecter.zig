@@ -26,7 +26,8 @@ pub fn main() anyerror!void {
     const current_exe_dir = try std.fs.selfExeDirPath(&out_buf);
 
     var gpa = heap.GeneralPurposeAllocator(.{}){};
-    var alloc = gpa.allocator();
+    defer _ = gpa.deinit();
+    const alloc = gpa.allocator();
 
     const paths = [_][]const u8{current_exe_dir, "../lib/some_dll.dll"};
     var joined_paths = try std.fs.path.join(alloc, &paths);
