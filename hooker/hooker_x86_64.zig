@@ -14,7 +14,7 @@ var orig_sysvcall: ?@TypeOf(sysvcall) = null;
 var orig_zigcall: ?@TypeOf(zigcall) = null;
 //var orig_x64naked: ?@TypeOf(x64naked) = null;
 
-var orig_x64call: zigject.hook.Hook(x64call, hook_pre_x64call, zigject.hook.HookMethod.JmpInstruction) = undefined;
+var orig_x64call = zigject.hook.Hook(x64call, hook_pre_x64call, zigject.hook.HookMethod.JmpInstruction){};
 
 pub fn call() anyerror!void {
     std.log.info("x86_64 call()", .{});
@@ -22,7 +22,7 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
-    orig_x64call = try zigject.hook.hook_pre(orig_x64call);
+    try orig_x64call.hook_pre();
     std.log.info("calling   x64call({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = x64call(a1, a2, a3, a4, a5);
     std.log.info("result    x64call(): {d}", .{res});

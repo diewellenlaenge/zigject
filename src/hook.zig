@@ -20,36 +20,41 @@ pub const HookError = error{
 
 pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime method: anytype) type {
     return struct {
+        const Self = @This();
+
         orig_fn: @TypeOf(orig_fn) = orig_fn,
         hook_pre_fn: @TypeOf(hook_pre_fn) = hook_pre_fn,
         method: @TypeOf(method) = method,
         trampoline_fn: ?@TypeOf(orig_fn) = null,
+
+        pub fn hook_pre(hook: *Self) HookError!void {
+            const orig_ti = @typeInfo(@TypeOf(hook.orig_fn)).Fn;
+            const hook_pre_ti = @typeInfo(@TypeOf(hook.hook_pre_fn)).Fn;
+
+            const orig_cc = orig_ti.calling_convention;
+            const hook_pre_cc = hook_pre_ti.calling_convention;
+
+            // TODO: not only compare calling convention, but everything
+            if (orig_cc != hook_pre_cc) {
+                return HookError.DifferentCallingConvention;
+            }
+
+            switch (hook.method) {
+                .JmpInstruction => try hook_jmp(hook),
+                else => return HookError.UnsupportedHookMethd,
+            }
+
+            // switch (orig_ti.calling_convention) {
+            //     .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
+            //     else => return HookError.UnsupportedCallingConvention,
+            // }
+        }
+
+        fn hook_jmp(hook: *Self) HookError!void {
+            var hook_ = hook;
+            hook_.method = HookMethod.DebugRegister1;
+        }
     };
-}
-
-pub fn hook_pre(hook: anytype) HookError!@TypeOf(hook) {
-    const orig_ti = @typeInfo(@TypeOf(hook.orig_fn)).Fn;
-    const hook_pre_ti = @typeInfo(@TypeOf(hook.hook_pre_fn)).Fn;
-
-    const orig_cc = orig_ti.calling_convention;
-    const hook_pre_cc = hook_pre_ti.calling_convention;
-
-    // TODO: not only compare calling convention, but everything
-    if (orig_cc != hook_pre_cc) {
-        return HookError.DifferentCallingConvention;
-    }
-
-    var hook_ = switch (hook.method) {
-        .JmpInstruction => try hook_jmp(hook),
-        else => return HookError.UnsupportedHookMethd,
-    };
-
-    // switch (orig_ti.calling_convention) {
-    //     .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
-    //     else => return HookError.UnsupportedCallingConvention,
-    // }
-
-    return hook_;
 }
 
 pub fn hook_pre_old(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, method: HookMethod) HookError!Hook {
@@ -67,7 +72,7 @@ pub fn hook_pre_old(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, me
     var hook = Hook{ .orig_fn = orig_fn, .hook_pre_fn = hook_pre_fn, .method = method, .trampoline_fn = undefined };
 
     hook = switch (method) {
-        .JmpInstruction => try hook_jmp(hook),
+        .JmpInstruction => try hook.hook_jmp(hook),
         else => return HookError.UnsupportedHookMethd,
     };
 
@@ -80,15 +85,6 @@ pub fn hook_pre_old(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, me
 }
 
 /// helper to "just" hook something and don't care about technical details
-pub fn hook_simple(comptime orig_fn: anytype, comptime hook_pre_fn: anytype) HookError!Hook {
-    return hook_pre(orig_fn, hook_pre_fn, HookMethod.JmpInstruction);
-}
-
-pub fn hook_jmp(hook: anytype) HookError!@TypeOf(hook) {
-    var hook_ = hook;
-    hook_.method = HookMethod.DebugRegister1;
-    return hook_;
-}
 
 // https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention
 // The code for a typical prolog might be:
