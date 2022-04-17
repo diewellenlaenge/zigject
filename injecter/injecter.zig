@@ -1,6 +1,8 @@
 const std = @import("std");
 const io = std.io;
 const heap = std.heap;
+const win = std.os.windows;
+const fs = std.fs;
 
 const zigject = @import("zigject");
 const win32 = @import("win32");
@@ -19,28 +21,26 @@ fn toNarrow(from: []const u16) ![]const u8 {
     return std.unicode.utf16leToUtf8Alloc(alloc, from);
 }
 
-fn getOutput(comptime what: []const u8, comptime default: []const u8) anyerror![]const u8 {
-    const stdout = io.getStdOut().writer();
-    const stdin = io.getStdIn().reader();
-
-    try stdout.print("Enter {s}: (default: {s}) ", .{ what, default });
-
-    var buf = [_]u8{0} ** 260;
-    if (try stdin.readUntilDelimiterOrEof(buf[0..], '\n')) |input| {
-        if (std.ascii.eqlIgnoreCase(input, "")) {
-            return input;
-        }
-    }
-    return default;
-}
-
 pub fn main() anyerror!void {
-    const proc = try toWide(try getOutput("Proccess", "Notepad.exe"));
-    var dll = try toWide(try getOutput("Dll", ".\\zig-out\\lib\\zigject-injectee.dll"));
+    var gpa = heap.GeneralPurposeAllocator(.{}){};
+    var alloc = gpa.allocator();
+    var args = try std.process.argsWithAllocator(alloc);
+    const base_path = try args.next(alloc).?;
+    defer alloc.free(base_path);
 
-    var buf = [_]u16{0} ** std.os.windows.MAX_PATH;
+    var concat_str = std.ArrayList(u8).init(alloc);
+    defer concat_str.deinit();
+    try concat_str.appendSlice(base_path);
+    try concat_str.appendSlice("/../../lib/zigject-injectee.dll");
 
-    _ = win32.storage.file_system.GetFullPathNameW(@ptrCast([*:0]const u16, &dll), buf.len, &buf, null);
+    var buf = [_]u8{0} ** win.MAX_PATH;
+    std.mem.copy(u8, &buf, try concat_str.toOwnedSliceSentinel(0));
+    const path_len = try win.normalizePath(u8, &buf);
+
+    const normalized = buf[0..path_len];
+    std.log.info("normalized {s} with len {d}", .{normalized, normalized.len});
+    const proc = try toWide("Notepad.exe");
+    const dll = try toWide(normalized);
 
     const pid = zigject.process.FindFirstProcessIdByName(proc) catch {
         std.log.err("Could not find process {s}", .{try toNarrow(proc)});
@@ -51,5 +51,5 @@ pub fn main() anyerror!void {
 
     std.log.info("Process found with id {d}", .{pid});
 
-    _ = try zigject.inject.RemoteThread(pid, buf[0..], true);
+    _ = try zigject.inject.RemoteThread(pid, proc, true);
 }
