@@ -22,31 +22,31 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(stdcall, hook_pre_stdcall);
+    try zigject.hook.hook_pre(stdcall, hook_pre_stdcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   stdcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = stdcall(a1, a2, a3, a4, a5);
     std.log.info("result    stdcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(thiscall, hook_pre_thiscall);
+    try zigject.hook.hook_pre(thiscall, hook_pre_thiscall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   thiscall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = thiscall(a1, a2, a3, a4, a5);
     std.log.info("result    thiscall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(fastcall, hook_pre_fastcall);
+    try zigject.hook.hook_pre(fastcall, hook_pre_fastcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   fastcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = fastcall(a1, a2, a3, a4, a5);
     std.log.info("result    fastcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(vectorcall, hook_pre_vectorcall);
+    try zigject.hook.hook_pre(vectorcall, hook_pre_vectorcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   vectorcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = vectorcall(a1, a2, a3, a4, a5);
     std.log.info("result    vectorcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(zigcall, hook_pre_zigcall);
+    try zigject.hook.hook_pre(zigcall, hook_pre_zigcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   zigcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = zigcall(a1, a2, a3, a4, a5);
     std.log.info("result    zigcall(): {d}", .{res});
