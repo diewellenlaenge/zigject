@@ -12,7 +12,7 @@ pub fn hook_pre(comptime orig_fn: anytype, comptime hook_pre_fn: anytype) HookEr
     const orig_cc = orig_ti.calling_convention;
     const hook_pre_cc = hook_pre_ti.calling_convention;
 
-	// TODO: not only compare calling convention, but everything
+    // TODO: not only compare calling convention, but everything
     if (orig_cc != hook_pre_cc) {
         return HookError.DifferentCallingConvention;
     }
