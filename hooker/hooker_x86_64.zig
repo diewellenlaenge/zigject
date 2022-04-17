@@ -40,10 +40,8 @@ pub fn call() anyerror!void {
     std.log.info("", .{});
     try zigject.hook.hook_pre(x64naked, hook_pre_x64naked);
     std.log.info("calling   x64naked()", .{});
-    asm volatile (
-        \\jmp x64naked
-        \\x64naked_return:
-    );
+    asm volatile ("jmp x64naked");
+    asm volatile ("x64naked_return:");
     std.log.info("result from x64naked(): n/a", .{});
 }
 
