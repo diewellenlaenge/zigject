@@ -22,19 +22,17 @@ fn toNarrow(from: []const u16) ![]const u8 {
 }
 
 pub fn main() anyerror!void {
+    var out_buf = [_]u8{0} ** win.MAX_PATH;
+    const current_exe_dir = try std.fs.selfExeDirPath(&out_buf);
+
     var gpa = heap.GeneralPurposeAllocator(.{}){};
     var alloc = gpa.allocator();
-    var args = try std.process.argsWithAllocator(alloc);
-    const base_path = try args.next(alloc).?;
-    defer alloc.free(base_path);
 
-    var concat_str = std.ArrayList(u8).init(alloc);
-    defer concat_str.deinit();
-    try concat_str.appendSlice(base_path);
-    try concat_str.appendSlice("/../../lib/zigject-injectee.dll");
+    const paths = [_][]const u8{current_exe_dir, "../lib/some_dll.dll"};
+    var joined_paths = try std.fs.path.join(alloc, &paths);
 
     var buf = [_]u8{0} ** win.MAX_PATH;
-    std.mem.copy(u8, &buf, try concat_str.toOwnedSliceSentinel(0));
+    std.mem.copy(u8, &buf, joined_paths);
     const path_len = try win.normalizePath(u8, &buf);
 
     const normalized = buf[0..path_len];
@@ -42,6 +40,7 @@ pub fn main() anyerror!void {
     const proc = try toWide("Notepad.exe");
     const dll = try toWide(normalized);
 
+//"../lib/zigject-injectee.dll"
     const pid = zigject.process.FindFirstProcessIdByName(proc) catch {
         std.log.err("Could not find process {s}", .{try toNarrow(proc)});
         return;
