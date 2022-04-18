@@ -19,6 +19,7 @@ pub const HookError = error{
     UnsupportedCallingConvention,
     DifferentCallingConvention,
     UnsupportedHookMethd,
+    VirtualProtect,
 };
 
 pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime method: anytype) type {
@@ -43,14 +44,20 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
             }
 
             var old_protect = memory.PAGE_NOACCESS;
-            memory.VirtualProtect(@ptrCast(*anyopaque, hook.orig_fn), 4096, memory.PAGE_READWRITE, &old_protect);
+            var result = memory.VirtualProtect(@intToPtr(*anyopaque, @ptrToInt(hook.orig_fn)), 4096, memory.PAGE_READWRITE, &old_protect);
+            if (result == win.FALSE) {
+                return HookError.VirtualProtect;
+            }
 
             switch (hook.method) {
                 .JmpInstruction => try hook_jmp(hook),
                 else => return HookError.UnsupportedHookMethd,
             }
 
-            memory.VirtualProtect(hook.orig_fn, 4096, old_protect, null);
+            result = memory.VirtualProtect(@intToPtr(*anyopaque, @ptrToInt(hook.orig_fn)), 4096, old_protect, null);
+            if (result == win.FALSE) {
+                return HookError.VirtualProtect;
+            }
 
             // switch (orig_ti.calling_convention) {
             //     .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
