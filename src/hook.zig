@@ -1,5 +1,8 @@
 const std = @import("std");
-const builtin = @import("builtin");
+
+const win = std.os.windows;
+const win32 = @import("lib/zigwin32/win32.zig");
+const memory = win32.system.memory;
 
 pub const HookMethod = enum {
     JmpInstruction,
@@ -39,10 +42,15 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
                 return HookError.DifferentCallingConvention;
             }
 
+            var old_protect = memory.PAGE_NOACCESS;
+            memory.VirtualProtect(@ptrCast(*anyopaque, hook.orig_fn), 4096, memory.PAGE_READWRITE, &old_protect);
+
             switch (hook.method) {
                 .JmpInstruction => try hook_jmp(hook),
                 else => return HookError.UnsupportedHookMethd,
             }
+
+            memory.VirtualProtect(hook.orig_fn, 4096, old_protect, null);
 
             // switch (orig_ti.calling_convention) {
             //     .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
@@ -54,6 +62,8 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
             var hook_ = hook;
             hook_.method = HookMethod.DebugRegister1;
         }
+
+        //fn trampoline_x64call(hook: *Self) HookError!void {}
     };
 }
 
