@@ -32,7 +32,7 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
         method: @TypeOf(method) = method,
         trampoline_fn: ?@TypeOf(orig_fn) = null,
 
-        pub fn hook_pre(hook: *Self) HookError!void {
+        pub fn hookPre(hook: *Self) HookError!void {
             const orig_ti = @typeInfo(@TypeOf(hook.orig_fn)).Fn;
             const hook_pre_ti = @typeInfo(@TypeOf(hook.hook_pre_fn)).Fn;
 
@@ -52,7 +52,7 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
             }
 
             switch (hook.method) {
-                .JmpInstruction => try hook_jmp(hook),
+                .JmpInstruction => try hookJmp(hook),
                 else => return HookError.UnsupportedHookMethd,
             }
 
@@ -67,7 +67,7 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
             // }
         }
 
-        fn hook_jmp(hook: *Self) HookError!void {
+        fn hookJmp(hook: *Self) HookError!void {
             var hook_ = hook;
             hook_.method = HookMethod.DebugRegister1;
         }
@@ -84,7 +84,7 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
 //    push   R13
 //    sub    RSP, fixed-allocation-size
 //    lea    R13, 128[RSP]
-fn hook_pre_x64call(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, method: HookMethod) HookError!void {
+fn hookPreX64call(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, method: HookMethod) HookError!void {
     _ = orig_fn;
     _ = hook_pre_fn;
     _ = method;

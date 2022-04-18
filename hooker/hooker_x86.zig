@@ -9,12 +9,12 @@ var a3: u32 = 30;
 var a4: u32 = 40;
 var a5: u32 = 50;
 
-var orig_stdcall: ?@TypeOf(stdcall) = null;
-var orig_thiscall: ?@TypeOf(thiscall) = null;
-var orig_fastcall: ?@TypeOf(fastcall) = null;
-var orig_vectorcall: ?@TypeOf(vectorcall) = null;
-var orig_zigcall: ?@TypeOf(zigcall) = null;
-//var orig_x86naked: ?@TypeOf(x86naked) = null;
+var hook_stdcall: ?@TypeOf(stdcall) = null;
+var hook_thiscall: ?@TypeOf(thiscall) = null;
+var hook_fastcall: ?@TypeOf(fastcall) = null;
+var hook_vectorcall: ?@TypeOf(vectorcall) = null;
+var hook_zigcall: ?@TypeOf(zigcall) = null;
+//var hook_x86naked: ?@TypeOf(x86naked) = null;
 
 pub fn call() anyerror!void {
     std.log.info("x86 call()", .{});
@@ -22,31 +22,31 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(stdcall, hook_pre_stdcall, zigject.hook.HookMethod.JmpInstruction);
+    try zigject.hook.hookPre(stdcall, hookPreStdcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   stdcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = stdcall(a1, a2, a3, a4, a5);
     std.log.info("result    stdcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(thiscall, hook_pre_thiscall, zigject.hook.HookMethod.JmpInstruction);
+    try zigject.hook.hookPre(thiscall, hookPreThiscall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   thiscall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = thiscall(a1, a2, a3, a4, a5);
     std.log.info("result    thiscall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(fastcall, hook_pre_fastcall, zigject.hook.HookMethod.JmpInstruction);
+    try zigject.hook.hookPre(fastcall, hookPreFastcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   fastcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = fastcall(a1, a2, a3, a4, a5);
     std.log.info("result    fastcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(vectorcall, hook_pre_vectorcall, zigject.hook.HookMethod.JmpInstruction);
+    try zigject.hook.hookPre(vectorcall, hookPreVectorcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   vectorcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = vectorcall(a1, a2, a3, a4, a5);
     std.log.info("result    vectorcall(): {d}", .{res});
 
     std.log.info("", .{});
-    try zigject.hook.hook_pre(zigcall, hook_pre_zigcall, zigject.hook.HookMethod.JmpInstruction);
+    try zigject.hook.hookPre(zigcall, hookPreZigcall, zigject.hook.HookMethod.JmpInstruction);
     std.log.info("calling   zigcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = zigcall(a1, a2, a3, a4, a5);
     std.log.info("result    zigcall(): {d}", .{res});
@@ -68,9 +68,9 @@ fn stdcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Stdcall) u32 {
     return random_global;
 }
 
-fn hook_pre_stdcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Stdcall) u32 {
-    std.log.info("hook_pre  stdcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_stdcall.?(p1, p2, p3, p4, p5);
+fn hookPreStdcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Stdcall) u32 {
+    std.log.info("hookPre   stdcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_stdcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -81,9 +81,9 @@ fn thiscall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Thiscall) u32
     return random_global;
 }
 
-fn hook_pre_thiscall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Thiscall) u32 {
-    std.log.info("hook_pre  thiscall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_thiscall.?(p1, p2, p3, p4, p5);
+fn hookPreThiscall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Thiscall) u32 {
+    std.log.info("hookPre   thiscall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_thiscall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -94,9 +94,9 @@ fn fastcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Fastcall) u32
     return random_global;
 }
 
-fn hook_pre_fastcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Fastcall) u32 {
-    std.log.info("hook_pre  fastcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_fastcall.?(p1, p2, p3, p4, p5);
+fn hookPreFastcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Fastcall) u32 {
+    std.log.info("hookPre   fastcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_fastcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -107,9 +107,9 @@ fn vectorcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Vectorcall)
     return random_global;
 }
 
-fn hook_pre_vectorcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Vectorcall) u32 {
-    std.log.info("hook_pre  vectorcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_vectorcall.?(p1, p2, p3, p4, p5);
+fn hookPreVectorcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Vectorcall) u32 {
+    std.log.info("hookPre   vectorcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_vectorcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -120,9 +120,9 @@ fn zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u
     return random_global;
 }
 
-fn hook_pre_zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u32 {
-    std.log.info("hook_pre  zigcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_zigcall.?(p1, p2, p3, p4, p5);
+fn hookPreZigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u32 {
+    std.log.info("hookPre   zigcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_zigcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -133,6 +133,6 @@ fn hook_pre_zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspe
 //    asm volatile ("jmp x86naked_return");
 //}
 //
-//fn hook_pre_x86naked() callconv(.Naked) void {
+//fn hookPreX86naked() callconv(.Naked) void {
 //    // TODO
 //}

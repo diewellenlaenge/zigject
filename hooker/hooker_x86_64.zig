@@ -9,12 +9,12 @@ var a3: u32 = 30;
 var a4: u32 = 40;
 var a5: u32 = 50;
 
-//var orig_x64call: ?@TypeOf(x64call) = null;
-var orig_sysvcall: ?@TypeOf(sysvcall) = null;
-var orig_zigcall: ?@TypeOf(zigcall) = null;
-//var orig_x64naked: ?@TypeOf(x64naked) = null;
+//var hook_x64call: ?@TypeOf(x64call) = null;
+var hook_sysvcall: ?@TypeOf(sysvcall) = null;
+var hook_zigcall: ?@TypeOf(zigcall) = null;
+//var hook_x64naked: ?@TypeOf(x64naked) = null;
 
-var orig_x64call = zigject.hook.Hook(x64call, hook_pre_x64call, zigject.hook.HookMethod.JmpInstruction){};
+var hook_x64call = zigject.hook.Hook(x64call, hookPreX64call, zigject.hook.HookMethod.JmpInstruction){};
 
 pub fn createJump(comptime address: u64) void {
     const template = "jmp 0x{X}";
@@ -30,25 +30,25 @@ pub fn call() anyerror!void {
     var res: u32 = 0;
 
     std.log.info("", .{});
-    try orig_x64call.hook_pre();
+    try hook_x64call.hookPre();
     std.log.info("calling   x64call({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     res = x64call(a1, a2, a3, a4, a5);
     std.log.info("result    x64call(): {d}", .{res});
 
     // std.log.info("", .{});
-    // try zigject.hook.hook_pre(sysvcall, hook_pre_sysvcall, zigject.hook.HookMethod.JmpInstruction);
+    // try zigject.hook.hookPre(sysvcall, hookPreSysvcall, zigject.hook.HookMethod.JmpInstruction);
     // std.log.info("calling   sysv({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     // res = sysvcall(a1, a2, a3, a4, a5);
     // std.log.info("result    sysv(): {d}", .{res});
 
     // std.log.info("", .{});
-    // try zigject.hook.hook_pre(zigcall, hook_pre_zigcall, zigject.hook.HookMethod.JmpInstruction);
+    // try zigject.hook.hookPre(zigcall, hookPreZigcall, zigject.hook.HookMethod.JmpInstruction);
     // std.log.info("calling   zigcall({d}, {d}, {d}, {d}, {d})", .{ a1, a2, a3, a4, a5 });
     // res = zigcall(a1, a2, a3, a4, a5);
     // std.log.info("result    zigcall(): {d}", .{res});
 
     // std.log.info("", .{});
-    // try zigject.hook.hook_pre(x64naked, hook_pre_x64naked, zigject.hook.HookMethod.JmpInstruction);
+    // try zigject.hook.hookPre(x64naked, hookPreX64naked, zigject.hook.HookMethod.JmpInstruction);
     // std.log.info("calling   x64naked()", .{});
     // asm volatile ("jmp x64naked");
     // asm volatile ("x64naked_return:");
@@ -63,9 +63,9 @@ fn x64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
     return random_global;
 }
 
-fn hook_pre_x64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
-    std.log.info("hook_pre  x64call({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_x64call.trampoline_fn.?(p1, p2, p3, p4, p5);
+fn hookPreX64call(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.C) u32 {
+    std.log.info("hookPre   x64call({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_x64call.trampoline_fn.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -76,9 +76,9 @@ fn sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
     return random_global;
 }
 
-fn hook_pre_sysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
-    std.log.info("hook_pre  sysvcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_sysvcall.?(p1, p2, p3, p4, p5);
+fn hookPreSysvcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.SysV) u32 {
+    std.log.info("hookPre   sysvcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_sysvcall.?(p1, p2, p3, p4, p5);
 }
 
 //
@@ -89,19 +89,19 @@ fn zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u
     return random_global;
 }
 
-fn hook_pre_zigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u32 {
-    std.log.info("hook_pre  zigcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
-    return orig_zigcall.?(p1, p2, p3, p4, p5);
+fn hookPreZigcall(p1: u32, p2: u32, p3: u32, p4: u32, p5: u32) callconv(.Unspecified) u32 {
+    std.log.info("hookPre   zigcall({d}, {d}, {d}, {d}, {d})", .{ p1, p2, p3, p4, p5 });
+    return hook_zigcall.?(p1, p2, p3, p4, p5);
 }
 
 //
 //
 //
-// export fn x64naked() callconv(.Naked) void {
+// export fn X64naked() callconv(.Naked) void {
 //     std.log.info("orig      naked()", .{});
 //     asm volatile ("jmp x64naked_return");
 // }
 
-// fn hook_pre_x64naked() callconv(.Naked) void {
+// fn hookPreX64naked() callconv(.Naked) void {
 //     // TODO
 // }

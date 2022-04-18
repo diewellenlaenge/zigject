@@ -34,7 +34,7 @@ pub fn main() anyerror!void {
     const proc_str = try utils.toNarrow(alloc, proc);
     defer alloc.free(proc_str);
 
-    const pid = zigject.process.FindFirstProcessIdByName(proc) catch {
+    const pid = zigject.process.findFirstProcessIdByName(proc) catch {
         std.log.err("Could not find process {s}", .{proc_str});
         return;
     };
@@ -45,5 +45,5 @@ pub fn main() anyerror!void {
     std.log.info("Found process {s} with dll {s}", .{proc_str, dll_str});
     std.log.info("Process found with id {d}", .{pid});
 
-    _ = try zigject.inject.RemoteThread(pid, dll, true);
+    _ = try zigject.inject.remoteThread(pid, dll, true);
 }

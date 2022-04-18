@@ -20,7 +20,7 @@ pub const InjectError = error {
 };
 
 /// return value is only valid if wait is true
-pub fn RemoteThread(process_id: win.DWORD, path: []const u16, wait: bool) InjectError!u32 {
+pub fn remoteThread(process_id: win.DWORD, path: []const u16, wait: bool) InjectError!u32 {
     const process = threading.OpenProcess(threading.PROCESS_ALL_ACCESS, win.FALSE, process_id) orelse return InjectError.OpenProcess;
     defer _ = foundation.CloseHandle(process);
 
