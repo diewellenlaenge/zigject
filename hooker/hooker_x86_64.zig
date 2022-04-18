@@ -16,6 +16,14 @@ var orig_zigcall: ?@TypeOf(zigcall) = null;
 
 var orig_x64call = zigject.hook.Hook(x64call, hook_pre_x64call, zigject.hook.HookMethod.JmpInstruction){};
 
+pub fn createJump(comptime address: u64) void {
+    const template = "jmp 0x{X}";
+
+    comptime var buf = [_]u8{0} ** ("jmp 0x00000000".len);
+    const instruction = comptime try std.fmt.bufPrint(&buf, template, .{address});
+    asm volatile (instruction);
+}
+
 pub fn call() anyerror!void {
     std.log.info("x86_64 call()", .{});
 
