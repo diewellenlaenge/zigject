@@ -57,35 +57,6 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
     };
 }
 
-pub fn hook_pre_old(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, method: HookMethod) HookError!Hook {
-    const orig_ti = @typeInfo(@TypeOf(orig_fn)).Fn;
-    const hook_pre_ti = @typeInfo(@TypeOf(hook_pre_fn)).Fn;
-
-    const orig_cc = orig_ti.calling_convention;
-    const hook_pre_cc = hook_pre_ti.calling_convention;
-
-    // TODO: not only compare calling convention, but everything
-    if (orig_cc != hook_pre_cc) {
-        return HookError.DifferentCallingConvention;
-    }
-
-    var hook = Hook{ .orig_fn = orig_fn, .hook_pre_fn = hook_pre_fn, .method = method, .trampoline_fn = undefined };
-
-    hook = switch (method) {
-        .JmpInstruction => try hook.hook_jmp(hook),
-        else => return HookError.UnsupportedHookMethd,
-    };
-
-    switch (orig_ti.calling_convention) {
-        .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
-        else => return HookError.UnsupportedCallingConvention,
-    }
-
-    return hook;
-}
-
-/// helper to "just" hook something and don't care about technical details
-
 // https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention
 // The code for a typical prolog might be:
 //    mov    [RSP + 8], RCX
