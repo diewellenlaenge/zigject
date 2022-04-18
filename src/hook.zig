@@ -89,3 +89,11 @@ fn hookPreX64call(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, meth
     _ = hook_pre_fn;
     _ = method;
 }
+
+fn createJump(comptime address: u64) void {
+    const template = "jmp 0x{X}";
+
+    comptime var buf = [_]u8{0} ** ("jmp 0x00000000".len);
+    const instruction = comptime try std.fmt.bufPrint(&buf, template, .{address});
+    asm volatile (instruction);
+}
