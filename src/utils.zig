@@ -9,3 +9,6 @@ pub fn toNarrow(alloc: std.mem.Allocator, from: []const u16) ![]const u8 {
     return std.unicode.utf16leToUtf8Alloc(alloc, from);
 }
 
+pub fn forcePtr(value: anytype) *anyopaque {
+    return @intToPtr(*anyopaque, @ptrToInt(value));
+}

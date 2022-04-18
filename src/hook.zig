@@ -3,6 +3,7 @@ const std = @import("std");
 const win = std.os.windows;
 const win32 = @import("lib/zigwin32/win32.zig");
 const memory = win32.system.memory;
+const utils = @import("utils.zig");
 
 pub const HookMethod = enum {
     JmpInstruction,
@@ -43,8 +44,9 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
                 return HookError.DifferentCallingConvention;
             }
 
+            const patch_bytes = 32; // should be enough for now, make this dynamic later to avoid potentially unnecessary page protection changes
             var old_protect = memory.PAGE_NOACCESS;
-            var result = memory.VirtualProtect(@intToPtr(*anyopaque, @ptrToInt(hook.orig_fn)), 4096, memory.PAGE_READWRITE, &old_protect);
+            var result = memory.VirtualProtect(utils.forcePtr(hook.orig_fn), patch_bytes, memory.PAGE_READWRITE, &old_protect);
             if (result == win.FALSE) {
                 return HookError.VirtualProtect;
             }
@@ -54,7 +56,7 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
                 else => return HookError.UnsupportedHookMethd,
             }
 
-            result = memory.VirtualProtect(@intToPtr(*anyopaque, @ptrToInt(hook.orig_fn)), 4096, old_protect, null);
+            result = memory.VirtualProtect(utils.forcePtr(hook.orig_fn), patch_bytes, old_protect, null);
             if (result == win.FALSE) {
                 return HookError.VirtualProtect;
             }
