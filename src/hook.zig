@@ -44,6 +44,18 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
                 return HookError.DifferentCallingConvention;
             }
 
+            switch (hook.method) {
+                .JmpInstruction => try hookJmp(hook),
+                else => return HookError.UnsupportedHookMethd,
+            }
+
+            // switch (orig_ti.calling_convention) {
+            //     .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
+            //     else => return HookError.UnsupportedCallingConvention,
+            // }
+        }
+
+        fn hookJmp(hook: *Self) HookError!void {
             const patch_bytes = 32; // should be enough for now, make this dynamic later to avoid potentially unnecessary page protection changes
             var old_protect = memory.PAGE_NOACCESS;
             var result = memory.VirtualProtect(utils.forcePtr(hook.orig_fn), patch_bytes, memory.PAGE_READWRITE, &old_protect);
@@ -60,16 +72,6 @@ pub fn Hook(comptime orig_fn: anytype, comptime hook_pre_fn: anytype, comptime m
             if (result == win.FALSE) {
                 return HookError.VirtualProtect;
             }
-
-            // switch (orig_ti.calling_convention) {
-            //     .C => try hook_pre_x64call(orig_fn, hook_pre_fn, method),
-            //     else => return HookError.UnsupportedCallingConvention,
-            // }
-        }
-
-        fn hookJmp(hook: *Self) HookError!void {
-            var hook_ = hook;
-            hook_.method = HookMethod.DebugRegister1;
         }
 
         //fn trampoline_x64call(hook: *Self) HookError!void {}
